@@ -11,5 +11,7 @@ Developed using:
 To run tests
 1. Open the file config/default.ini and update with:
     - executable_path: path to the compiled dbshadow command line app
-    - mysql_config_1: path to the mysql dbshadow config
+    - mysql_config_in_1: path to the mysql dbshadow in config
+    - mysql_config_out_1: path to the mysql dbshadow out config
+    *****NOTE:  We currently expect that the dataSource.url in the in and out configs will point to a 'dbshadow1' DB.  Our test is going to drop (if exists) and then recreate this DB
 2. From the root directory of the project run:  nosetests --tc-file=config/default.ini tests/CreateTests.py
