@@ -45,7 +45,7 @@ class TruncateTests(unittest.TestCase):
         self.dbshadow_executable = config['dbshadow']['executable_path']
 
     def test_01_truncate_mysql_to_mysql_no_existing_destination_table(self):
-        """Truncate - mysql to mysql: empty existing destination table
+        """Truncate - mysql to mysql: no existing destination table
 
         :author: Sharon Lambson
         :component: Truncate - mysql to mysql
