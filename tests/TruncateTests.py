@@ -32,20 +32,20 @@ class AddTests(unittest.TestCase):
         self.mysql_db_lib.create_happy_path_tables(self.test_database_1, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup.sql")
         self.dbshadow_executable = config['dbshadow']['executable_path']
 
-    def test_01_add_mysql_to_mysql_no_existing_destination_table(self):
-        """Add - mysql to mysql: empty existing destination table
+    def test_01_truncate_mysql_to_mysql_no_existing_destination_table(self):
+        """Truncate - mysql to mysql: empty existing destination table
 
         :author: Sharon Lambson
-        :component: Add - mysql to mysql
+        :component: Truncate - mysql to mysql
         :setup:
             1. Create a happy path mysql table for the source
         :steps:
-            1. Run the command line: ./dbshadow -a --source people --dest peeps --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
+            1. Run the command line: ./dbshadow -t --source people --dest peeps --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
         :expectedResults:
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_2, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            output = subprocess.check_output([self.dbshadow_executable, '-t', '--source', self.test_table_1, '--dest', self.test_table_2, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
             source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
@@ -59,20 +59,20 @@ class AddTests(unittest.TestCase):
         except CalledProcessError as e:
             self.assertTrue(False, "We got an non zero return code: {} when we ran the dbshadow app".format(e.returncode))
 
-    def test_02_add_mysql_to_mysql_empty_existing_destination_table(self):
-        """Add - mysql to mysql: empty existing destination table
+    def test_02_truncate_mysql_to_mysql_empty_existing_destination_table(self):
+        """Truncate - mysql to mysql: empty existing destination table
 
         :author: Sharon Lambson
-        :component: Add - mysql to mysql
+        :component: Truncate - mysql to mysql
         :setup:
             1. Create a happy path mysql table for the source
         :steps:
-            1. Run the command line: ./dbshadow -a --source people --dest people4 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
+            1. Run the command line: ./dbshadow -t --source people --dest people4 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
         :expectedResults:
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_5, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            output = subprocess.check_output([self.dbshadow_executable, '-t', '--source', self.test_table_1, '--dest', self.test_table_5, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
             source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
@@ -86,27 +86,25 @@ class AddTests(unittest.TestCase):
         except CalledProcessError as e:
             self.assertTrue(False, "We got an non zero return code: {} when we ran the dbshadow app".format(e.returncode))
 
-    def test_03_add_mysql_to_mysql_populated_existing_destination_table_no_duplicates(self):
-        """Add - mysql to mysql: populated existing destination table - no duplicates
+    def test_03_truncate_mysql_to_mysql_populated_existing_destination_table_no_duplicates(self):
+        """Truncate - mysql to mysql: populated existing destination table - no duplicates
 
         :author: Sharon Lambson
-        :component: Add - mysql to mysql
+        :component: Truncate - mysql to mysql
         :setup:
             1. Create a happy path mysql table for the source
         :steps:
-            1. Run the command line: ./dbshadow -a --source people --dest people2 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
+            1. Run the command line: ./dbshadow -t --source people --dest people2 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
         :expectedResults:
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            destination_records_start_state = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_3)
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_3, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            output = subprocess.check_output([self.dbshadow_executable, '-t', '--source', self.test_table_1, '--dest', self.test_table_3, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
             source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
             destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_3)
-            expected_destination_records = destination_records_start_state + source_records
-            matched,output = self.mysql_db_lib.compare_two_record_lists(expected_destination_records, destination_records)
+            matched,output = self.mysql_db_lib.compare_two_record_lists(source_records, destination_records)
             self.assertTrue(matched,output)
             source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
             destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_3)
