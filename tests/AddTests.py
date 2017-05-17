@@ -46,7 +46,7 @@ class AddTests(unittest.TestCase):
         self.dbshadow_executable = config['dbshadow']['executable_path']
 
     def test_01_add_mysql_to_mysql_no_existing_destination_table(self):
-        """Add - mysql to mysql: empty existing destination table
+        """Add - mysql to mysql: no existing destination table
 
         :author: Sharon Lambson
         :component: Add - mysql to mysql
