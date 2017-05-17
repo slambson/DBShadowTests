@@ -13,3 +13,8 @@ create table people5 (id INTEGER, name VARCHAR(200), age INTEGER);
 insert into people5(id, name, age) values (1, 'sharon', 38);
 insert into people5(id, name, age) values (2, 'bop', 30);
 insert into people5(id, name, age) values (3, 'jim', 38);
+create table people6 (id INTEGER PRIMARY KEY, name VARCHAR(200), age INTEGER);
+insert into people6(id, name, age) values (1, 'slambson', 38);
+insert into people6(id, name, age) values (2, 'slambsonian', 32);
+insert into people6(id, name, age) values (3, 'slam', 38);
+create table people7 (id INTEGER PRIMARY KEY, name VARCHAR(200), age INTEGER);

@@ -14,6 +14,8 @@ class AddTests(unittest.TestCase):
     test_table_4 = "people3"
     test_table_5 = "people4"
     test_table_6 = "people5"
+    test_table_7 = "people6"
+    test_table_8 = "people7"
     dbshadow_executable = None
     mysql_in_config_1 = None
     mysql_out_config_1 = None
@@ -143,6 +145,34 @@ class AddTests(unittest.TestCase):
             self.assertTrue(matched,output)
             source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
             destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_6)
+            matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
+            self.assertTrue(matched, output)
+        except CalledProcessError as e:
+            self.assertTrue(False, "We got an non zero return code: {} when we ran the dbshadow app".format(e.returncode))
+
+    def test_05_add_mysql_to_mysql_one_primary_key(self):
+        """Add - mysql to mysql: one primary key
+
+        :author: Sharon Lambson
+        :component: Add - mysql to mysql
+        :setup:
+            1. Create a happy path mysql table for the source with 1 primary key
+            2. Create a destination table that is empty
+        :steps:
+            1. Run the command line: ./dbshadow -a --source people6 --dest people7 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
+        :expectedResults:
+            1. Should Run successfully without error.  The destination table should match the source table
+        """
+        try:
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_7, '--dest', self.test_table_8, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            expected_output = "Committed 3 records"
+            self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
+            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_7)
+            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_8)
+            matched,output = self.mysql_db_lib.compare_two_record_lists(source_records, destination_records)
+            self.assertTrue(matched,output)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_7)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_8)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
