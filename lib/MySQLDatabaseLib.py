@@ -112,7 +112,24 @@ class MySQLDatabaseLib:
             cursor.execute(query)
             result = cursor.fetchall()
         except Exception as err:
-            raise Exception("Failed creating test table {}: {}".format(database, err))
+            raise Exception("Failed getting records for test table {}: {}".format(database, err))
+        finally:
+            if cursor is not None:
+                cursor.close()
+            if connection is not None:
+                connection.close()
+        return result
+
+    def get_schema_from_table(self, database, table):
+        try:
+            connection = self._get_connection_to_database(database)
+            cursor = connection.cursor()
+
+            query = ("DESC {}".format(table))
+            cursor.execute(query)
+            result = cursor.fetchall()
+        except Exception as err:
+            raise Exception("Failed getting schema for test table {}: {}".format(database, err))
         finally:
             if cursor is not None:
                 cursor.close()
@@ -139,3 +156,15 @@ class MySQLDatabaseLib:
                 return False, "Record mismatch: for row: {} age: {} not equal: {}".format(index, age_1, age_2)
 
         return True, "All records matched!"
+
+    def verify_mysql_config_database(self, file, test_db):
+        f = open(file)
+        for line in iter(f):
+            if "dataSource.url" in line:
+                if "/{}<".format(test_db) not in line:
+                    f.close()
+                    return False,"CANNOT RUN TEST: DB config file: {} does not have the correct DB: {} specified for the dataSource.ulr.  Please correct file config.".format(file, test_db)
+                else:
+                    break
+        f.close()
+        return True,"Config DB is correct"
