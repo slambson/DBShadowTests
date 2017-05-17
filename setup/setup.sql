@@ -9,3 +9,7 @@ create table people3 (id INTEGER, name VARCHAR(100));
 insert into people3(id, name) values (1, 'kim');
 insert into people3(id, name) values(2, 'jim');
 create table people4 (id INTEGER, name VARCHAR(200), age INTEGER);
+create table people5 (id INTEGER, name VARCHAR(200), age INTEGER);
+insert into people5(id, name, age) values (1, 'sharon', 38);
+insert into people5(id, name, age) values (2, 'bop', 30);
+insert into people5(id, name, age) values (3, 'jim', 38);
