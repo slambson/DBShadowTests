@@ -13,5 +13,8 @@ To run tests
     - executable_path: path to the compiled dbshadow command line app
     - mysql_config_in_1: path to the mysql dbshadow in config
     - mysql_config_out_1: path to the mysql dbshadow out config
+    - mysql_config_in_2: path to the mysql dbshadow2 in config
+    - mysql_config_out_2: path to the mysql dbshadow2 out config
     *****NOTE:  We currently expect that the dataSource.url in the in and out configs will point to a 'dbshadow1' DB.  Our test is going to drop (if exists) and then recreate this DB
+    *****NOTE:  We currently expect that the dataSource.url in the in and out 2 configs will point to a 'dbshadow2' DB.  Our test is going to drop (if exists) and then recreate this DB
 2. From the root directory of the project run:  nosetests --tc-file=config/default.ini tests/CreateTests.py tests/AddTests.py tests/TruncateTests.py tests/SyncTests.py
