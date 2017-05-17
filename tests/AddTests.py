@@ -9,14 +9,14 @@ class AddTests(unittest.TestCase):
 
     test_database_1 = "dbshadow1"
     test_database_2 = "dbshadow2"
-    test_table_1 = "people"
-    test_table_2 = "peeps"
-    test_table_3 = "people2"
-    test_table_4 = "people3"
-    test_table_5 = "people4"
-    test_table_6 = "people5"
-    test_table_7 = "people6"
-    test_table_8 = "people7"
+    people_table = "people"   # Happy Path table (int, varchar(200), int schema, no PK)
+    people2_table = "people2" # Happy Path table (int, varchar(200), int schema, no PK) different data
+    people3_table = "people3" # Happy Path table (int, varchar(100) schema, no PK)
+    people4_table = "people4" # Happy Path table (int, varchar(200), int schema, no PK) no data
+    people5_table = "people5" # Happy Path table (int, varchar(200), int schema, no PK) different data
+    people6_table = "people6" # Happy Path table (int, varchar(200), int schema, with PK) different data
+    people7_table = "people7" # Happy Path table (int, varchar(200), int schema, with PK) no data
+    peeps_table = "peeps"     # Name of the destination DB that doesn't currently exist
     dbshadow_executable = None
     mysql_in_config_1 = None
     mysql_out_config_1 = None
@@ -41,8 +41,8 @@ class AddTests(unittest.TestCase):
         self.mysql_db_lib.create_test_database(self.test_database_1)
         self.mysql_db_lib.drop_test_database(self.test_database_2)
         self.mysql_db_lib.create_test_database(self.test_database_2)
-        self.mysql_db_lib.create_happy_path_tables(self.test_database_1, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup.sql")
-        self.mysql_db_lib.create_happy_path_tables(self.test_database_2, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup2.sql")
+        self.mysql_db_lib.create_test_tables(self.test_database_1, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup.sql")
+        self.mysql_db_lib.create_test_tables(self.test_database_2, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup2.sql")
         self.dbshadow_executable = config['dbshadow']['executable_path']
 
     def test_01_add_mysql_to_mysql_no_existing_destination_table(self):
@@ -58,15 +58,15 @@ class AddTests(unittest.TestCase):
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_2, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people_table, '--dest', self.peeps_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_2)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.peeps_table)
             matched,output = self.mysql_db_lib.compare_two_record_lists(source_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_2)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.peeps_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
@@ -86,15 +86,15 @@ class AddTests(unittest.TestCase):
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_5, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people_table, '--dest', self.people4_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_5)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people4_table)
             matched,output = self.mysql_db_lib.compare_two_record_lists(source_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_5)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people4_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
@@ -111,20 +111,20 @@ class AddTests(unittest.TestCase):
         :steps:
             1. Run the command line: ./dbshadow -a --source people --dest people2 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
         :expectedResults:
-            1. Should Run successfully without error.  The destination table should match the source table
+            1. Should Run successfully without error.  The destination table should be the existing table data plus the source data.
         """
         try:
-            destination_records_start_state = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_3)
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_3, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            destination_records_start_state = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people2_table)
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people_table, '--dest', self.people2_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_3)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people2_table)
             expected_destination_records = destination_records_start_state + source_records
             matched,output = self.mysql_db_lib.compare_two_record_lists(expected_destination_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_3)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people2_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
@@ -141,20 +141,20 @@ class AddTests(unittest.TestCase):
         :steps:
             1. Run the command line: ./dbshadow -a --source people --dest people5 --srcConfig mysql.in.cfg.xml --destConfig mysql.out.cfg.xml
         :expectedResults:
-            1. Should Run successfully without error.  The destination table should match the source table
+            1. Should Run successfully without error.  The destination table should be the existing table data plus the source data.
         """
         try:
-            destination_records_start_state = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_6)
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_6, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            destination_records_start_state = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people5_table)
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people_table, '--dest', self.people5_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_6)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people5_table)
             expected_destination_records = destination_records_start_state + source_records
             matched,output = self.mysql_db_lib.compare_two_record_lists(expected_destination_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_6)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people5_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
@@ -174,15 +174,15 @@ class AddTests(unittest.TestCase):
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_7, '--dest', self.test_table_8, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people6_table, '--dest', self.people7_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_7)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_8)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people6_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people7_table)
             matched,output = self.mysql_db_lib.compare_two_record_lists(source_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_7)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_8)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people6_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people7_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
@@ -202,17 +202,17 @@ class AddTests(unittest.TestCase):
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            destination_records_start_state = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_4)
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_4, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
+            destination_records_start_state = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people3_table)
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people_table, '--dest', self.people3_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_1])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_4)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people3_table)
             expected_destination_records = destination_records_start_state + source_records
             matched,output = self.mysql_db_lib.compare_two_record_lists(expected_destination_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_4)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people3_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
@@ -231,15 +231,15 @@ class AddTests(unittest.TestCase):
             1. Should Run successfully without error.  The destination table should match the source table
         """
         try:
-            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.test_table_1, '--dest', self.test_table_5, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_2])
+            output = subprocess.check_output([self.dbshadow_executable, '-a', '--source', self.people_table, '--dest', self.people4_table, '--srcConfig', self.mysql_in_config_1, '--destConfig', self.mysql_out_config_2])
             expected_output = "Committed 3 records"
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
-            source_records = self.mysql_db_lib.get_records_from_table(self.test_database_1, self.test_table_1)
-            destination_records = self.mysql_db_lib.get_records_from_table(self.test_database_2, self.test_table_5)
+            source_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_1, self.people_table)
+            destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_2, self.people4_table)
             matched,output = self.mysql_db_lib.compare_two_record_lists(source_records, destination_records)
             self.assertTrue(matched,output)
-            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.test_table_1)
-            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_2, self.test_table_5)
+            source_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_1, self.people_table)
+            destination_schema = self.mysql_db_lib.get_schema_from_table(self.test_database_2, self.people4_table)
             matched, output = self.mysql_db_lib.compare_two_record_lists(source_schema, destination_schema)
             self.assertTrue(matched, output)
         except CalledProcessError as e:
