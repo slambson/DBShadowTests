@@ -4,8 +4,14 @@ from mysql.connector import errorcode
 
 class MySQLDatabaseLib:
 
-    def __init__(self):
-        pass
+    username = None
+    password = None
+    host = None
+
+    def __init__(self, username, password, host):
+        self.username = username
+        self.password = password
+        self.host = host
 
     def _get_connection_to_database(self, database):
         """Get a connection to the specified database
@@ -15,8 +21,8 @@ class MySQLDatabaseLib:
         :return: MySQLConnection
         """
         try:
-            connection = mysql.connector.connect(user='root', password='testit',
-                                             host='127.0.0.1',
+            connection = mysql.connector.connect(user=self.username, password=self.password,
+                                             host=self.host,
                                              database=database)
         except Exception as err:
             raise Exception("Failed getting connection to database {}: {}".format(database, err))
@@ -30,8 +36,8 @@ class MySQLDatabaseLib:
         :type database: str
         """
         try:
-            connection = mysql.connector.connect(user='root', password='testit',
-                                                 host='127.0.0.1')
+            connection = mysql.connector.connect(user=self.username, password=self.password,
+                                                 host=self.host)
             cursor = connection.cursor()
             cursor.execute("DROP DATABASE {}".format(database))
             cursor.close()

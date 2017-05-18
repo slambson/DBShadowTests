@@ -25,7 +25,10 @@ class CreateTests(unittest.TestCase):
         self.mysql_out_config_1 = config['dbshadow']['mysql_config_out_1']
         self.mysql_in_config_2 = config['dbshadow']['mysql_config_in_2']
         self.mysql_out_config_2 = config['dbshadow']['mysql_config_out_2']
-        self.mysql_db_lib = MySQLDatabaseLib()
+        mysql_username = config['mysql']['mysql_username']
+        mysql_password = config['mysql']['mysql_password']
+        mysql_host = config['mysql']['mysql_host']
+        self.mysql_db_lib = MySQLDatabaseLib(mysql_username, mysql_password, mysql_host)
         result,message = self.mysql_db_lib.verify_mysql_config_database(self.mysql_in_config_1, self.test_database_1)
         self.assertTrue(result, message);
         result,message = self.mysql_db_lib.verify_mysql_config_database(self.mysql_out_config_1, self.test_database_1)
