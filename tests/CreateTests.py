@@ -224,7 +224,7 @@ class CreateTests(unittest.TestCase):
             self.assertTrue(expected_output in output, "Expected the output to contain the text: '{}' but instead this was the output: {}".format(expected_output, output))
             expected_destination_records = self.mysql_db_lib.get_selected_records_from_table(self.test_database_1, self.people_table, "select id,name from {}")
             destination_records = self.mysql_db_lib.get_all_records_from_table(self.test_database_2, self.peeps_table)
-            matched,output = self.mysql_db_lib.compare_two_record_lists(expected_destination_records, destination_records, max_column=2)
+            matched,output = self.mysql_db_lib.compare_two_record_lists(expected_destination_records, destination_records, check_columns=["id", "name"])
             self.assertTrue(matched,output)
         except CalledProcessError as e:
             self.assertTrue(False, "We got an non zero return code: {} when we ran the dbshadow app".format(e.returncode))

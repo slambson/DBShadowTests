@@ -177,15 +177,15 @@ class MySQLDatabaseLib:
                 connection.close()
         return result
 
-    def compare_two_record_lists(self, record_list_1, record_list_2, max_column=3):
+    def compare_two_record_lists(self, record_list_1, record_list_2, check_columns=["id", "name", "age"]):
         """Compare two lists of database query records
 
         :param record_list_1: The source record list
         :type record_list_1: List
         :param record_list_2: The destination record list
         :type record_list_2: List
-        :param max_column: The max number of columns if we had a select statement that limited the columns selected
-        :type max_column: int
+        :param check_columns: List of the columns to check.  List should only contain at most ["id", "name", "age"]
+        :type check_columns: List
         :return tuple: boolean on whether all the records match and a string containing message details
         :rtype (bool, str)
         """
@@ -193,15 +193,17 @@ class MySQLDatabaseLib:
                 return False,"Record size were not the same.  Source size was: {}  Destination size was: {}".format(len(record_list_1), len(record_list_2))
 
         for index in range(len(record_list_1)):
-            id_1 = record_list_1[index][0]
-            id_2 = record_list_2[index][0]
-            if id_1 != id_2:
-                return False, "Record mismatch: for row: {} id: {} not equal: {}".format(index, id_1, id_2)
-            name_1 = record_list_1[index][1]
-            name_2 = record_list_2[index][1]
-            if name_1 != name_2:
-                return False, "Record mismatch: for row: {} name: {} not equal: {}".format(index, name_1, name_2)
-            if max_column == 3:
+            if "id" in check_columns:
+                id_1 = record_list_1[index][0]
+                id_2 = record_list_2[index][0]
+                if id_1 != id_2:
+                    return False, "Record mismatch: for row: {} id: {} not equal: {}".format(index, id_1, id_2)
+            if "name" in check_columns:
+                name_1 = record_list_1[index][1]
+                name_2 = record_list_2[index][1]
+                if name_1 != name_2:
+                    return False, "Record mismatch: for row: {} name: {} not equal: {}".format(index, name_1, name_2)
+            if "age" in check_columns:
                 age_1 = record_list_1[index][2]
                 age_2 = record_list_2[index][2]
                 if age_1 != age_2:
