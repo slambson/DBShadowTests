@@ -19,13 +19,19 @@ class TruncateTests(unittest.TestCase):
     dbshadow_executable = None
     mysql_in_config_1 = None
     mysql_out_config_1 = None
+    mysql_setup_file_1 = None
+    mysql_setup_file_2 = None
+    mysql_in_config_2 = None
+    mysql_out_config_2 = None
     mysql_db_lib = None
 
     def setUp(self):
         self.mysql_in_config_1 = config['dbshadow']['mysql_config_in_1']
         self.mysql_out_config_1 = config['dbshadow']['mysql_config_out_1']
+        self.mysql_setup_file_1 = config['dbshadow']['mysql_setup_file_1']
         self.mysql_in_config_2 = config['dbshadow']['mysql_config_in_2']
         self.mysql_out_config_2 = config['dbshadow']['mysql_config_out_2']
+        self.mysql_setup_file_2 = config['dbshadow']['mysql_setup_file_2']
         mysql_username = config['mysql']['mysql_username']
         mysql_password = config['mysql']['mysql_password']
         mysql_host = config['mysql']['mysql_host']
@@ -43,8 +49,8 @@ class TruncateTests(unittest.TestCase):
         self.mysql_db_lib.create_test_database(self.test_database_1)
         self.mysql_db_lib.drop_test_database(self.test_database_2)
         self.mysql_db_lib.create_test_database(self.test_database_2)
-        self.mysql_db_lib.create_test_tables(self.test_database_1, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup.sql")
-        self.mysql_db_lib.create_test_tables(self.test_database_2, "/Users/sharon/PycharmProjects/DBShadowTests/setup/setup2.sql")
+        self.mysql_db_lib.create_test_tables(self.test_database_1, self.mysql_setup_file_1)
+        self.mysql_db_lib.create_test_tables(self.test_database_2, self.mysql_setup_file_2)
         self.dbshadow_executable = config['dbshadow']['executable_path']
 
     def test_01_truncate_mysql_to_mysql_no_existing_destination_table(self):
